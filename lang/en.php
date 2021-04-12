@@ -1,7 +1,6 @@
 <?php
 
 $LANG = array(
-
 # config.php
 'L_BAD_URL_EXTENSION'	=> 'Bad url extension format',
 'L_URLS_EXTENSION'		=> 'Urls extension',
@@ -11,4 +10,3 @@ $LANG = array(
 'L_CATEGORY'			=> 'Category',
 'L_STATIC'				=> 'Static page'
 );
-?>

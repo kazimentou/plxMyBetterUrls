@@ -9,4 +9,3 @@ $LANG = array(
 'L_CATEGORY'			=> 'Categoria',
 'L_STATIC'				=> 'Pagina estatica'
 );
-?>
