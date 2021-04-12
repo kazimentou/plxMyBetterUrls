@@ -29,10 +29,10 @@ class plxMyBetterUrls extends plxPlugin {
 		# déclaration des hooks
 		$this->addHook('plxMotorConstruct', 'plxMotorConstruct');
 		$this->addHook('plxMotorDemarrageNewCommentaire', 'plxMotorDemarrageNewCommentaire');
-		$this->addHook('plxMotorConstructLoadPlugins', 'Redirect301');
-		$this->addHook('IndexEnd', 'RewriteUrls');
-		$this->addHook('FeedEnd', 'RewriteUrls');
-		$this->addHook('SitemapEnd', 'RewriteUrls');
+		$this->addHook('plxMotorConstructLoadPlugins', 'redirect301');
+		$this->addHook('IndexEnd', 'rewriteUrls');
+		$this->addHook('FeedEnd', 'rewriteUrls');
+		$this->addHook('SitemapEnd', 'rewriteUrls');
 		$this->addHook('plxFeedPreChauffageBegin', 'plxFeedPreChauffageBegin');
 	}
 
@@ -41,9 +41,14 @@ class plxMyBetterUrls extends plxPlugin {
 	 *
 	 * @author	Stephane F
 	 **/
-	public function Redirect301() {
+	public function redirect301() {
 
 		echo '<?php
+		if(preg_match("#/index\.php\?preview$#", $_SERVER["REQUEST_URI"])) {
+			# Preview
+			return;
+		}
+
 		if(!defined("PLX_ADMIN") AND substr(str_replace($_SERVER["QUERY_STRING"], "", $_SERVER["REQUEST_URI"]),-1)=="?") {
 			# redirection si lien http://server.com/?contenu vers http://server.com/contenu
 			header("Status: 301 Moved Permanently", false, 301);
@@ -151,7 +156,7 @@ class plxMyBetterUrls extends plxPlugin {
 	 *
 	 * @author	Stephane F
 	 **/
-	public function RewriteUrls() {
+	public function rewriteUrls() {
 		echo '<?php
 			$output = preg_replace("/article[0-9]+\/([a-z0-9-]+)/", "'.$this->article.'$1'.$this->getParam('ext_url').'", $output);
 			$output = preg_replace("/categorie[0-9]+\/([a-z0-9-]+)/", "'.$this->category.'$1'.$this->getParam('ext_url').'", $output);

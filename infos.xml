@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
-	<title><![CDATA[MyBetterUrls]]></title>
-	<author><![CDATA[Stephane F.]]></author>
-	<version>1.5.5</version>
-	<date>10/04/2017</date>
-	<site>http://pluxopolis.net/</site>
+	<title>MyBetterUrls</title>
+	<author>Stephane F., Jean-Pierre Pourrez</author>
+	<version>1.6.0</version>
+	<date>12/04/2021</date>
+	<site>https://kazimentou.fr/</site>
 	<description><![CDATA[Amélioration des urls de PluXml]]></description>
+	<scope>site</scope>
 	<requirements></requirements>
 </document>
