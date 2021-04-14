@@ -1,56 +1,64 @@
-<?php if(!defined('PLX_ROOT')) exit; ?>
 <?php
-
-# Control du token du formulaire
-plxToken::validateFormToken($_POST);
+if(!defined('PLX_ROOT')) { exit; }
 
 if(!empty($_POST)) {
-	if($_POST['ext_url'][0]!='.' AND $_POST['ext_url'][0]!='')
+	# Control du token du formulaire
+	plxToken::validateFormToken($_POST);
+
+	if(!empty($_POST['ext_url']) and $_POST['ext_url'][0] != '.')
 		plxMsg::Error($plxPlugin->getLang('L_BAD_URL_EXTENSION'));
 	else {
-		$ext = ($_POST['ext_url']!=''? '.'.plxUtils::title2url($_POST['ext_url']):'');
-		$plxPlugin->setParam('ext_url', $ext, 'string');
-		$plxPlugin->setParam('format_article', plxUtils::title2url($_POST['format_article']), 'string');
-		$plxPlugin->setParam('format_category', plxUtils::title2url($_POST['format_category']), 'string');
-		$plxPlugin->setParam('format_static', plxUtils::title2url($_POST['format_static']), 'string');
+		$plxPlugin->setParam('ext_url', !empty($_POST['ext_url']) ? '.' . plxUtils::title2url($_POST['ext_url']) : '', 'string');
+		foreach(array('article', 'category', 'static') as $field) {
+			$name = 'format_' . $field;
+			$plxPlugin->setParam($name, plxUtils::title2url($_POST[$name]), 'string');
+		}
 		$plxPlugin->saveParams();
 	}
-	header('Location: parametres_plugin.php?p=plxMyBetterUrls');
+	header('Location: parametres_plugin.php?p=' . $plugin);
 	exit;
 }
 
-$format_article = $plxPlugin->getParam('format_article');
-$format_category = $plxPlugin->getParam('format_category');
-$format_static = $plxPlugin->getParam('format_static');
 ?>
-<form id="form_config_plugin" action="parametres_plugin.php?p=plxMyBetterUrls" method="post">
+<form id="form_config_plugin" method="post">
 	<fieldset>
 		<p class="field"><label for="id_ext_url"><?php $plxPlugin->lang('L_URLS_EXTENSION') ?>&nbsp;:</label></p>
-		<input onkeyup="upd_spans(this.value)" type="text" id="id_ext_url" name="ext_url" size="10" maxlength="11" value="<?php echo $plxPlugin->getParam('ext_url') ?>" />&nbsp;ex: <strong>.htm</strong>, .html, .php
+		<input onkeyup="upd_spans(this.value)" type="text" id="id_ext_url" name="ext_url" size="10" maxlength="11" value="<?= $plxPlugin->getParam('ext_url') ?>" />&nbsp;ex: <strong>.html</strong>, .htm, .php, .asp
 
 		<p><?php $plxPlugin->lang('L_URLS_FORMAT') ?></p>
 
 		<p class="field">
-			<label for="id_format_article"><?php $plxPlugin->lang('L_ARTICLE') ?> :</label>
-			<?php echo $plxAdmin->aConf['racine'] ?><?php plxUtils::printInput('format_article',$format_article,'text','5-255') ?>/mon-article<span id="ext_article"><?php echo $plxPlugin->getParam('ext_url') ?></span>
+<?php
+$urls = array(
+	'article'	=> L_DEFAULT_NEW_ARTICLE_URL,
+	'category'	=> L_DEFAULT_NEW_CATEGORY_URL,
+	'static'	=> L_DEFAULT_NEW_STATIC_URL,
 
-			<label for="id_format_article"><?php $plxPlugin->lang('L_CATEGORY') ?> :</label>
-			<?php echo $plxAdmin->aConf['racine'] ?><?php plxUtils::printInput('format_category',$format_category,'text','5-255') ?>/ma-categorie<span id="ext_category"><?php echo $plxPlugin->getParam('ext_url') ?></span>
-
-			<label for="id_format_static"><?php $plxPlugin->lang('L_STATIC') ?> :</label>
-			<?php echo $plxAdmin->aConf['racine'] ?><?php plxUtils::printInput('format_static',$format_static,'text','5-255') ?>/ma-page-statique<span id="ext_static"><?php echo $plxPlugin->getParam('ext_url') ?></span>
+);
+foreach(array('article', 'category', 'static') as $field) {
+	$name = 'format_' . $field;
+?>
+			<label for="id_format_<?= $field ?>"><?php $plxPlugin->lang('L_' . strtoupper($field)) ?> :</label>
+			<?php echo $plxAdmin->aConf['racine'] ?><?php plxUtils::printInput($name, $plxPlugin->getParam($name),'text','5-255') ?>/<?= $urls[$field] ?><span class="ext_url"><?php echo $plxPlugin->getParam('ext_url') ?></span>
+<?php
+}
+?>
 		</p>
 
 		<p class="in-action-bar">
 			<?php echo plxToken::getTokenPostMethod() ?>
-			<input type="submit" name="submit" value="<?php $plxPlugin->lang('L_SAVE') ?>" />
+			<input type="submit" value="<?php $plxPlugin->lang('L_SAVE') ?>" />
 		</p>
 	</fieldset>
 </form>
 <script>
-function upd_spans(value) {
-	document.getElementById('ext_article').innerHTML = value;
-	document.getElementById('ext_category').innerHTML = value;
-	document.getElementById('ext_static').innerHTML = value;
-}
+(function() {
+	const spans = Array.from(document.querySelectorAll('#form_config_plugin .ext_url'));
+	const input = document.forms[0].elements['ext_url'];
+	input.onkeyup = function(event) {
+		spans.forEach(function(el) {
+			el.textContent = input.value;
+		})
+	};
+})();
 </script>
